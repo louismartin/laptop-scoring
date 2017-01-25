@@ -1,0 +1,92 @@
+Marque
+Référence
+Date
+Prix public
+Taille
+Résolution
+PPI
+Tactile
+Type de dalle
+Anti-reflet
+Luminosité
+Angle de vue
+Contraste
+Delta E
+Anti-rayures
+Capteur de luminosité
+Capteur de proximité
+Accéléromètre
+Gyroscope
+Compatible
+Inclus
+Emplacement
+Magnétique
+Système d'exploitation
+Navigateur
+Flash Player
+Boutique d'apps
+Interface constructeur
+Applications
+Wifi
+Bluetooth
+GPS
+4G / LTE
+3G
+Webcam
+Appareil photo
+Autofocus
+Flash LED
+Qualité vidéo
+Couleur(s)
+Composition
+Dimensions
+Poids
+Résistance à l'eau
+Résistance à la poussière
+Résistance aux chutes
+Processeur
+Gamme
+Fréquence
+Gravure
+PDT max.
+Cache
+64 bits
+Puce graphique intégrée
+Puce graphique dédiée
+Disque dur
+Mémoire (RAM)
+Prise casque
+Connecteur pour dock
+USB
+Lecteur de carte SD
+HDMI
+DisplayPort
+DisplayPort Thunderbolt
+VGA
+Ethernet
+Firewire
+Port série
+Lecteur DVD
+Lecteur de carte à puce (Smart Card)
+Clavier rétroéclairé
+Touchpad
+Trackpoint
+Pavé numérique
+Capacité mAh
+Capacité W/h
+Cellules
+Amovible
+Induction
+Autonomie
+Temps de charge
+Haut-parleurs
+Wireless Display (Widi)
+Miracast
+Airplay
+NFC
+Infrarouge
+Lecteur d'empreintes digitales
+Verrou Kensington
+Puce TPM
+Inclus
+Optionnel
