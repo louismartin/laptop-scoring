@@ -1,31 +1,104 @@
 ,processeur,cpu_benchmark
-0,Intel Celeron N3050,891.0
-1,Intel Core i7-6500U,4417.0
-2,Intel Core i5-6200U,3937.0
-3,Intel Core m3-6Y30,3056.0
-4,Intel Core i5-6300HQ,5954.0
-5,Intel Core i7-5500U,4002.0
-6,Intel Core i7-4770HQ,8956.0
-7,Intel Core i3-5005U,2917.0
-8,Intel Core i3-4005U,2451.0
-9,Intel Core i5-5250U,3610.0
-10,Intel Core i5-5287U,4691.0
-11,Intel Core i5-5257U,4355.0
-12,Intel Core i7-6700HQ,8113.0
-13,Intel Core i5-4210U,3377.0
-14,Intel Core i7-4720HQ,8038.0
-15,Intel Core M-5Y70,3029.0
-16,Intel Core i7-4810MQ,8666.0
-17,Intel Core i5-5200U,3485.0
-18,Intel Core i5-4200H,4404.0
-19,AMD A6-5200,2396.0
-20,Intel Pentium N3700,1874.0
-21,Intel Core i3-5010U,3064.0
-22,Intel Core i3-4100M,3468.0
-23,Intel Core i7-6500,4417.0
-24,Intel Core i7-6820HK,9076.0
-25,Intel Core i7-5700HQ,8420.0
-26,Intel Core i3-5020U,3191.0
-27,Intel Celeron N2840,1013.0
-28,Intel Pentium 3825U,2618.0
-29,Intel Atom Z3735F,908.0
+0,Intel Core i5-4210U,3378.0
+1,Intel Core i5-5250U,3610.0
+2,Intel Core i5-5257U,4355.0
+3,Intel Core i5-5287U,4691.0
+4,Intel Core i7-4810MQ,8667.0
+5,Intel Core i3-4100M,3468.0
+6,Intel Core M-5Y70,3029.0
+7,Intel Core i7-4770HQ,8956.0
+8,Intel Core i7-5500U,4002.0
+9,Intel Core i7-4720HQ,8038.0
+10,Intel Celeron N2840,1014.0
+11,Intel Core i7-5700HQ,8418.0
+12,Intel Core i3-5005U,2917.0
+13,Intel Core i3-5010U,3064.0
+14,Intel Core i5-5200U,3485.0
+15,Intel Core i3-5020U,3191.0
+16,Intel Celeron N3050,892.0
+17,Intel Core i5-4200H,4404.0
+18,Intel Atom Z3735F,908.0
+19,Intel Pentium N3700,1875.0
+20,Intel Core i5-6200U,3938.0
+21,Intel Core i5-6300HQ,5957.0
+22,Intel Core i3-4005U,2451.0
+23,Intel Core i7-6700HQ,8113.0
+24,Intel Core i7-6500U,4419.0
+25,Intel Core i7-6500,4419.0
+26,AMD A6-5200,2396.0
+27,Intel Core i7-6820HK,9077.0
+28,Intel Core m3-6Y30,3056.0
+29,Intel Pentium 3825U,2618.0
+30,Intel Core i7-4750HQ,8273.0
+31,Intel Core i7-4510U,3928.0
+32,Intel Core i3-6100U,3880.0
+33,Intel Celeron N3150,1691.0
+34,AMD E1-6015,887.0
+35,Intel Core i5-4210H,4514.0
+36,AMD A6-6310,2383.0
+37,AMD E1-6010,836.0
+38,Intel Core i5-6300U,4352.0
+39,Intel Core i7-6600U,4790.0
+40,Intel Core i3-5015U,3109.0
+41,Intel Core m7-6Y75,3565.0
+42,Intel Core m5-6Y54,3295.0
+43,AMD E1-2500,874.0
+44,AMD A6-7310,2614.0
+45,Intel Core i7-6560U,4799.0
+46,Intel Core i7-6650U,4890.0
+47,AMD A8-7410,2674.0
+48,Intel Pentium N3540,1959.0
+49,Intel Pentium N3710,1872.0
+50,Intel Pentium 3556U,1713.0
+51,Intel Celeron 3215U,1827.0
+52,AMD A10-8780P,
+53,AMD E2-6110,1885.0
+54,AMD A4-6210,2128.0
+55,Intel x5-Z8300,1207.0
+56,Intel Core i7-5600U,4285.0
+57,Intel Core i3-4000M,3231.0
+58,Intel Core i5-4210M,4206.0
+59,Intel Core i7-4712MQ,7147.0
+60,Intel Celeron N3060,968.0
+61,AMD E2-7110,2233.0
+62,Intel Core i5-6260U,4360.0
+63,Intel Celeron 2957U,1469.0
+64,AMD E1-7010,974.0
+65,Intel Celeron 3205U,1678.0
+66,Intel Core i5-6198DU,4160.0
+67,AMD FX-7500,3222.0
+68,Intel Core i7-6920HQ,9683.0
+69,AMD A10-8700P,3464.0
+70,Intel Xeon E3-1535M v5,9359.0
+71,Intel Xeon E3-1505M v5,8832.0
+72,AMD A4-7210,2482.0
+73,Intel Pentium 4405U,2975.0
+74,Intel Atom x5-Z8550,1940.0
+75,Intel x5-Z8350,1261.0
+76,Intel Core i7-7500U,5251.0
+77,Intel Core i5-7200U,4720.0
+78,Intel Core i7-4600U,4121.0
+79,Intel Core i5-7Y54,3164.0
+80,AMD A9-9410,2622.0
+81,Intel Core i7-7Y75,3972.0
+82,Intel Celeron N3350,1202.0
+83,Intel Core i5-4200U,3258.0
+84,Intel Pentium 3558U,1713.0
+85,Intel Core i3-7100U,3944.0
+86,Intel Celeron N3160,1656.0
+87,Intel Core i5-6360U,
+88,Intel Core i5-6267U,4941.0
+89,Intel Core i7-6820HQ,8792.0
+90,Intel Core m3-7Y30,3606.0
+91,Intel Core i3-4010U,2445.0
+92,Intel Core i3-6157U,3814.0
+93,AMD FX-8800P,4204.0
+94,Intel Celeron 3855U,1681.0
+95,Intel Core i3-6006U,3046.0
+96,Intel Core i5-6600K,7946.0
+97,AMD FX-9830P,5088.0
+98,Intel Core i7-7700HQ,8986.0
+99,Intel Core i5-7300HQ,6465.0
+100,Intel Core i7-7820HK,
+101,Intel Atom x5-Z8350,1261.0
+102,Intel Pentium N4200,2021.0

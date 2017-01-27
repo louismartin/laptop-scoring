@@ -7,6 +7,7 @@ from urllib.error import HTTPError
 
 from bs4 import BeautifulSoup
 import pandas as pd
+from tqdm import tqdm
 
 
 def save_and_reload_df(func):
@@ -162,8 +163,8 @@ def get_gpu_benchmark(gpu_name):
 
 
 @save_and_reload_df
-def get_cpu_dataframe():
-    cpus = df["processeur"].unique()
+def get_cpu_dataframe(cpus):
+    """Take a list of cpus (strings) and get there benchmark"""
     df_cpu = pd.DataFrame(cpus, columns=["processeur"])
     for index, row in tqdm(df_cpu.iterrows(), total=df_cpu.shape[0]):
         benchmark = get_cpu_benchmark(row["processeur"])
@@ -172,8 +173,8 @@ def get_cpu_dataframe():
 
 
 @save_and_reload_df
-def get_gpu_dataframe():
-    gpus = df["puce_graphique_dédiée"].unique()
+def get_gpu_dataframe(gpus):
+    """Take a list of gpus (strings) and get there benchmark"""
     df_gpu = pd.DataFrame(gpus, columns=["puce_graphique_dédiée"])
     for index, row in tqdm(df_gpu.iterrows(), total=df_gpu.shape[0]):
         gpu_name = row["puce_graphique_dédiée"]
