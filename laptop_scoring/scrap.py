@@ -151,12 +151,14 @@ def get_cpu_benchmark(cpu_name):
 def get_gpu_benchmark(gpu_name):
     root_url = "http://www.videocardbenchmark.net/gpu.php?gpu={}"
     try:
+        sli = "(SLI)" in gpu_name
+        gpu_name = gpu_name.replace(" (SLI)", "")
         url = root_url.format(gpu_name.replace(" ", "+"))
         html_doc = urlopen(url).read()
         soup = BeautifulSoup(html_doc, "html.parser")
         # Square with perf and single thread rating
         soup = soup.find_all("td", {"style": "text-align: center"})[-1]
-        benchmark = int(soup.find("span").text)
+        benchmark = int(soup.find("span").text) * (1 + 0.2*sli)
     except (HTTPError, IndexError):
         benchmark = None
     return benchmark

@@ -1,4 +1,5 @@
 from urllib.request import urlopen
+from urllib.parse import urljoin
 
 import numpy as np
 from bs4 import BeautifulSoup
@@ -11,9 +12,21 @@ def scale(col):
     return col
 
 
-def ease(x):
+def ease(x, method="sqrt", asymetric=False):
     """Ease extreme values"""
-    return np.sign(x)*np.sqrt(abs(x))
+    if method == "sqrt":
+        def func(x): return np.sqrt(x)
+    elif method == "log":
+        def func(x): return np.log(1+x)
+    else:
+        raise ValueError("Method {} is not valid".format(method))
+
+    if asymetric and x < 0:
+        # Penalize negatives
+        out = (1-np.exp(-x))
+    else:
+        out = np.sign(x)*func(abs(x))
+    return out
 
 
 def display_laptop(url, full=False):
@@ -34,5 +47,35 @@ def display_laptop(url, full=False):
         img.name = "h3"
         img.string = img["alt"]
         img.attrs = None
+
+        # Replace relative link to seller with absolute link
+        link = soup.find("a", {"class": "price"})
+        link.attrs["href"] = urljoin(url, link.attrs["href"])
+
         # Display html
         display(HTML(str(soup)))
+
+
+def print_score(row):
+    print("total: {0:.2f} - prix: {1:.2f}".format(row["total"], row["prix"]))
+    row = row.drop(["total", "score", "prix"])
+    row_pos = row[row > 0].sort_values(ascending=False)
+    row_neg = row[row < 0].sort_values()
+
+    string = ""
+    for index, value in row_pos.iteritems():
+        string += "{0}: {1:.2f}".format(index[:5], value)
+        if len(string) > 100:
+            break
+        else:
+            string += " / "
+    print(string)
+
+    string = ""
+    for index, value in row_neg.iteritems():
+        string += "{0}: {1:.2f}".format(index[:5], value)
+        if len(string) > 100:
+            break
+        else:
+            string += " / "
+    print(string)
