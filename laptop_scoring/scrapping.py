@@ -103,7 +103,6 @@ def get_laptops_urls():
     # Convert urls to dataframe
     s = pd.Series(specs_urls, name='url')
     df = s.to_frame()
-    df.to_csv(csv_path)
     return df
 
 
@@ -152,13 +151,20 @@ def get_gpu_benchmark(gpu_name):
     root_url = "http://www.videocardbenchmark.net/gpu.php?gpu={}"
     try:
         sli = "(SLI)" in gpu_name
+        pascal_models = ["1050", "1060", "1070", "1080"]
+        pascal = any([model in gpu_name for model in pascal_models])
         gpu_name = gpu_name.replace(" (SLI)", "")
         url = root_url.format(gpu_name.replace(" ", "+"))
         html_doc = urlopen(url).read()
         soup = BeautifulSoup(html_doc, "html.parser")
         # Square with perf and single thread rating
         soup = soup.find_all("td", {"style": "text-align: center"})[-1]
-        benchmark = int(soup.find("span").text) * (1 + 0.2*sli)
+        benchmark = int(soup.find("span").text)
+        # SLI are slightly better
+        benchmark *= (1 + 0.2*sli)
+        # The benchmark for pascal GPUs is the desktop benchmark !
+        benchmark *= (1 - 0.2*pascal)
+        benchmark = int(benchmark)
     except (HTTPError, IndexError):
         benchmark = None
     return benchmark

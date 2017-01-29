@@ -37,5 +37,11 @@ def process_and_clean(df):
     # Convert weights expressed in grams to kilograms
     df["poids"] = df["poids"].apply(lambda x: x if x<100 else x/1000)
     df["type_c"] = df["usb"].apply(lambda x: x.split("Type-C")[-1] if "Type-C" in x else "")
+    df[["day", "month", "year"]] = df["date"].str.split("/", expand=True).astype(int)
+
+    # Clean rows for easier reading
+    df["processeur"] = df["processeur"].str.replace("Intel Core", "")
+    df["puce_graphique_dédiée"] = df["puce_graphique_dédiée"].str.replace("Nvidia", "").str.replace("GeForce", "").str.replace("GTX", "").str.strip()
+
     df = df.fillna(0)
     return df

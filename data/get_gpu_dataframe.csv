@@ -1,57 +1,57 @@
 ,puce_graphique_dédiée,gpu_benchmark
 0,Non,0.0
-1,Nvidia Quadro K2100M,1243.0
-2,Nvidia GeForce GTX 960M,1994.0
-3,Nvidia GeForce GTX 965M (SLI),3558.0
+1,Nvidia Quadro K2100M,1242.0
+2,Nvidia GeForce GTX 960M,1997.0
+3,Nvidia GeForce GTX 965M (SLI),3560.4
 4,Nvidia GeForce 920M,698.0
 5,AMD Radeon R7 M360,677.0
-6,Nvidia GeForce GTX 950M,1788.0
-7,Nvidia GeForce GTX 980M,5642.0
-8,Nvidia GeForce GTX 970M,4009.0
+6,Nvidia GeForce GTX 950M,1786.0
+7,Nvidia GeForce GTX 980M,5644.0
+8,Nvidia GeForce GTX 970M,4007.0
 9,Nvidia GeForce 940M,941.0
 10,AMD Radeon HD 8400,367.0
 11,Nvidia GeForce GT 840M,863.0
 12,Nvidia GeForce 930M,887.0
-13,AMD Radeon R5 M330,578.0
+13,AMD Radeon R5 M330,579.0
 14,AMD Radeon R4 (Beema),0.0
 15,AMD Radeon R2 (Beema),0.0
-16,Nvidia GeForce GTX 965M,2965.0
+16,Nvidia GeForce GTX 965M,2967.0
 17,AMD Radeon R5 M320,598.0
 18,AMD Radeon HD 8240,283.0
 19,Nvidia GeForce GT 820M,591.0
-20,Nvidia GeForce GTX 970M (SLI),4810.8
+20,Nvidia GeForce GTX 970M (SLI),4808.4
 21,AMD Radeon R5 M430,0.0
-22,Nvidia GeForce 810M,428.0
-23,Nvidia GeForce GTX 860M,1678.0
-24,Nvidia GeForce 940MX,1232.0
+22,Nvidia GeForce 810M,438.0
+23,Nvidia GeForce GTX 860M,1680.0
+24,Nvidia GeForce 940MX,1234.0
 25,AMD Radeon R7 M440,978.0
 26,AMD FirePro M4100,0.0
 27,AMD Radeon R5 M335,573.0
-28,Nvidia GeForce 920MX,976.0
+28,Nvidia GeForce 920MX,982.0
 29,Nvidia GeForce 910M,433.0
-30,Nvidia GeForce GTX 1070,10964.0
+30,Nvidia GeForce GTX 1070,8772.800000000001
 31,AMD Radeon R7 M460,0.0
 32,AMD Radeon R7 M260DX,0.0
-33,Nvidia GeForce GTX 1060,8779.0
-34,Nvidia GeForce GTX 1080,11971.0
+33,Nvidia GeForce GTX 1060,7018.400000000001
+34,Nvidia GeForce GTX 1080,9579.2
 35,AMD Radeon R7 M370,1398.0
 36,AMD Radeon R7 M340,698.0
 37,AMD FirePro W4190M,1109.0
-38,Nvidia Quadro M1000M,1947.0
+38,Nvidia Quadro M1000M,1944.0
 39,Nvidia Quadro M2000M,2526.0
 40,Nvidia Quadro M3000M,4052.0
 41,Nvidia Quadro M600M,1704.0
 42,Nvidia Quadro M4000M,3683.0
-43,Nvidia GeForce GTX 980M (SLI),6770.4
+43,Nvidia GeForce GTX 980M (SLI),6772.8
 44,Nvidia Quadro M500M,1033.0
-45,Nvidia GeForce GTX 1070 (SLI),13156.8
-46,Nvidia GeForce 930MX,1139.0
+45,Nvidia GeForce GTX 1070 (SLI),10527.36
+46,Nvidia GeForce 930MX,1142.0
 47,AMD Radeon Pro 450,0.0
 48,AMD Radeon Pro 455,0.0
 49,Nvidia GeForce 950MX,0.0
 50,AMD Radeon R9 M385X,0.0
-51,Nvidia GeForce GTX 1080 (SLI),14365.199999999999
-52,AMD Radeon RX 460,4214.0
-53,Nvidia GeForce GTX 1050 Ti,5921.0
-54,Nvidia GeForce GTX 1050,5169.0
+51,Nvidia GeForce GTX 1080 (SLI),11495.04
+52,AMD Radeon RX 460,4212.0
+53,Nvidia GeForce GTX 1050 Ti,4718.400000000001
+54,Nvidia GeForce GTX 1050,4130.400000000001
 55,AMD Radeon R5 (Puma+),0.0
