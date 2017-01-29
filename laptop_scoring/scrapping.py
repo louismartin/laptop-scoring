@@ -41,7 +41,7 @@ def url2soup(url):
         html = html_handler.read()
         soup = BeautifulSoup(html, "html.parser")
     except HTTPError as e:
-        print("Error fetching {}: {}".format(url, e))
+        print("Error fetching {} : {}".format(url.lower(), e))
         soup = None
     return soup
 
@@ -146,7 +146,7 @@ def get_specs(url):
 @save_and_reload_df
 def get_all_laptops_specs(df_laptops_urls, n_threads=16):
     """Get specs for all laptops urls"""
-    df = df_laptops_urls
+    df = df_laptops_urls.copy()
 
     # Initialize columns
     url = df.iloc[0]["url"]
@@ -158,14 +158,10 @@ def get_all_laptops_specs(df_laptops_urls, n_threads=16):
     def fetch_and_process():
         while True:
             index, row = q.get()
-            if row.isnull().values[1:].all():
-                url = row["url"]
-                specs = get_specs(url)
-                if len(specs) == 0:
-                    print(url)
-                    pass
-                specs["url"] = url
-                df.loc[index] = specs
+            specs = get_specs(row["url"])
+            specs["url"] = row["url"]
+            specs["prix"] = row["prix"]
+            df.loc[index] = specs
             q.task_done()
 
     q = Queue(n_threads * 2)
