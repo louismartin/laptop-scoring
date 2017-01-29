@@ -1,6 +1,7 @@
 import os
 import time
 import json
+from multiprocessing.pool import ThreadPool
 from urllib.request import urlopen
 from urllib.parse import urljoin
 from urllib.error import HTTPError
@@ -8,6 +9,8 @@ from urllib.error import HTTPError
 from bs4 import BeautifulSoup
 import pandas as pd
 from tqdm import tqdm
+
+root_url = "http://www.comparez-malin.fr/informatique/pc-portable/"
 
 
 def save_and_reload_df(func):
@@ -64,7 +67,7 @@ def get_specs(url):
 
 
 def get_laptop_urls_in_page(page_url):
-    root_url = "http://www.comparez-malin.fr/informatique/pc-portable/"
+    """Get all links to laptops specs in one page"""
     html_doc = urlopen(page_url).read()
     soup = BeautifulSoup(html_doc, "html.parser")
     laptop_blocks = soup.find_all("div", {"class": "product"})
@@ -90,15 +93,31 @@ def add_columns(df, columns):
     return df
 
 
+def get_max_page():
+    """Get maximum page of laptops"""
+    url_handler = urlopen(root_url)
+    html = url_handler.read()
+    soup = BeautifulSoup(html, "html.parser")
+    # Find arrow at the bottom pointing to last page
+    # There are 2 arrows, get the last
+    arrow = soup.find_all("a", {"aria-label": "Next"})
+    max_page = int(arrow[-1]["rel"][0])
+    return max_page
+
+
 @save_and_reload_df
-def get_laptops_urls():
+def get_laptops_urls(n_threads=16):
     """Get links to each laptop page in a dataframe"""
-    root_url = "http://www.comparez-malin.fr/informatique/pc-portable/{}"
-    n = 265
+    max_page = get_max_page()
+    page_urls = [urljoin(root_url, "{}").format(i+1) for i in range(max_page)]
+
     specs_urls = {}
-    for i in tqdm(range(n)):
-        page_url = root_url.format(i+1)
-        specs_urls.update(get_laptop_urls_in_page(page_url))
+    # Parallel retrieval
+    results = ThreadPool(n_threads).imap_unordered(
+        get_laptop_urls_in_page, page_urls
+    )
+    for laptop_urls in tqdm(results, total=len(page_urls)):
+        specs_urls.update(laptop_urls)
 
     # Convert urls to dataframe
     s = pd.Series(specs_urls, name='url')
