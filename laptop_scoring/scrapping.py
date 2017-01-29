@@ -34,10 +34,21 @@ def save_and_reload_df(func):
     return func_wrapper
 
 
+def url2soup(url):
+    """Fetch a webpage a return a BeautifulSoup soup object from its HTML"""
+    try:
+        html_handler = urlopen(url)
+        html = html_handler.read()
+        soup = BeautifulSoup(html, "html.parser")
+    except HTTPError as e:
+        print("Error fetching {}: {}".format(url, e))
+        soup = None
+    return soup
+
+
 def get_laptop_urls_in_page(page_url):
     """Get all links to laptops specs in one page"""
-    html_doc = urlopen(page_url).read()
-    soup = BeautifulSoup(html_doc, "html.parser")
+    soup = url2soup(page_url)
     laptop_blocks = soup.find_all("div", {"class": "product"})
     specs_urls = {}
     for block in laptop_blocks:
@@ -64,9 +75,7 @@ def add_columns(df, columns):
 
 def get_max_page():
     """Get maximum page of laptops"""
-    url_handler = urlopen(root_url)
-    html = url_handler.read()
-    soup = BeautifulSoup(html, "html.parser")
+    soup = url2soup(root_url)
     # Find arrow at the bottom pointing to last page
     # There are 2 arrows, get the last
     arrow = soup.find_all("a", {"aria-label": "Next"})
@@ -112,9 +121,7 @@ def extract_spec(spec):
 
 def get_specs(url):
     """Return specs as a dictionary"""
-    html_handler = urlopen(url)
-    html = html_handler.read()
-    soup = BeautifulSoup(html, "html.parser")
+    soup = url2soup(url)
 
     specs = {}
     soup_price = soup.find("div", {"id": "results"})
@@ -176,14 +183,13 @@ def get_all_laptops_specs(df_laptops_urls, n_threads=16):
 
 def get_cpu_benchmark(cpu_name):
     root_url = "http://www.cpubenchmark.net/cpu.php?cpu={}"
-    try:
-        url = root_url.format(cpu_name.replace(" ", "+"))
-        html_doc = urlopen(url).read()
-        soup = BeautifulSoup(html_doc, "html.parser")
+    url = root_url.format(cpu_name.replace(" ", "+"))
+    soup = url2soup(url)
+    if soup:
         # Square with perf and single thread rating
         soup = soup.find("td", {"style": "text-align: center"})
         benchmark = int(soup.find("span").text)
-    except HTTPError:
+    else:
         benchmark = None
     return benchmark
 
@@ -196,17 +202,19 @@ def get_gpu_benchmark(gpu_name):
         pascal = any([model in gpu_name for model in pascal_models])
         gpu_name = gpu_name.replace(" (SLI)", "")
         url = root_url.format(gpu_name.replace(" ", "+"))
-        html_doc = urlopen(url).read()
-        soup = BeautifulSoup(html_doc, "html.parser")
-        # Square with perf and single thread rating
-        soup = soup.find_all("td", {"style": "text-align: center"})[-1]
-        benchmark = int(soup.find("span").text)
-        # SLI are slightly better
-        benchmark *= (1 + 0.2*sli)
-        # The benchmark for pascal GPUs is the desktop benchmark !
-        benchmark *= (1 - 0.2*pascal)
-        benchmark = int(benchmark)
-    except (HTTPError, IndexError):
+        soup = url2soup(url)
+        if soup:
+            # Square with perf and single thread rating
+            soup = soup.find_all("td", {"style": "text-align: center"})[-1]
+            benchmark = int(soup.find("span").text)
+            # SLI are slightly better
+            benchmark *= (1 + 0.2*sli)
+            # The benchmark for pascal GPUs is the desktop benchmark !
+            benchmark *= (1 - 0.2*pascal)
+            benchmark = int(benchmark)
+        else:
+            benchmark = None
+    except IndexError:
         benchmark = None
     return benchmark
 
