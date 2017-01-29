@@ -46,21 +46,31 @@ def url2soup(url):
     return soup
 
 
+def get_price(soup):
+    """Retrieve price inside a button from a BeautifulSoup object"""
+    tag = soup.find("a", {"class": "go"})
+    if tag:
+        price = tag.text
+        price = float(price.strip("€").replace(" ", "").replace(",", "."))
+    else:
+        # When the button with the price is not found, laptop is unavailable
+        price = None
+    return price
+
+
 def get_laptop_urls_in_page(page_url):
-    """Get all links to laptops specs in one page"""
+    """Get all links to laptops specs adn prices in one page"""
     soup = url2soup(page_url)
     laptop_blocks = soup.find_all("div", {"class": "product"})
     specs_urls = {}
     for block in laptop_blocks:
-        try:
+        if block.has_attr("id"):
             key = block["id"]
             url = block.find("a", {"class": "white"})["href"]
             if "tablette" not in url:
                 url = urljoin(root_url, url.split('/')[-1])
-                specs_urls[key] = url
-        except KeyError:
-            # Ads don't have an id so we just pass
-            pass
+                price = get_price(block)
+                specs_urls[key] = (url, price)
     return specs_urls
 
 
@@ -98,8 +108,8 @@ def get_laptops_urls(n_threads=16):
         specs_urls.update(laptop_urls)
 
     # Convert urls to dataframe
-    s = pd.Series(specs_urls, name='url')
-    df = s.to_frame()
+    df = pd.DataFrame(specs_urls).transpose()
+    df.columns = ["url", "prix"]
     return df
 
 
@@ -124,12 +134,6 @@ def get_specs(url):
     soup = url2soup(url)
 
     specs = {}
-    soup_price = soup.find("div", {"id": "results"})
-    soup_price = soup_price.find("div", {"class": "panel"})
-    try:
-        specs["prix"] = soup_price.find("a", {"class": "go"}).text
-    except AttributeError:
-        specs["prix"] = None
     soup = soup.find("div", {"id": "specs"})
     for spec in soup.find_all("tr"):
         key, value = extract_spec(spec)
@@ -172,9 +176,7 @@ def get_all_laptops_specs(df_laptops_urls, n_threads=16):
     try:
         for index, row in tqdm(df.iterrows(), total=df.shape[0]):
             q.put((index, row))
-        start_time = time.time()
         q.join()
-        print(time.time() - start_time)
     except KeyboardInterrupt:
         sys.exit(1)
 

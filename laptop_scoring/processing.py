@@ -4,7 +4,6 @@ import numpy as np
 def process_and_clean(df):
     """RIP PEP8, my laziness won over you"""
     df["prix_public"] = df["prix_public"].str.strip("€").str.replace(" ", "").str.replace(",", ".").astype(float)
-    df["prix"] = df["prix"].str.strip("€").str.replace(" ", "").str.replace(",", ".").astype(float)
     df[["coeurs", "min_freq", "max_freq"]] = df["fréquence"].str.split(expand=True)[[0, 2, 4]].astype(float)
     df["single_core_benchmark"] = df["cpu_benchmark"] / df["coeurs"]
     df["pdt_max"] = df["pdt_max"].str.split(expand=True)[0].astype(int)
