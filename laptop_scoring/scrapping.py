@@ -1,7 +1,11 @@
-import os
-import time
+
 import json
 from multiprocessing.pool import ThreadPool
+import os
+from queue import Queue
+import sys
+from threading import Thread
+import time
 from urllib.request import urlopen
 from urllib.parse import urljoin
 from urllib.error import HTTPError
@@ -30,42 +34,6 @@ def save_and_reload_df(func):
     return func_wrapper
 
 
-def extract_spec(spec):
-    key = spec.find("th", {"scope": "row"})
-    if key:
-        key = key.text
-        key = key.replace("\n", " ").strip()
-        value = spec.find("td").text
-        value = value.replace("\n", " ")
-        value = value.replace(u'\xa0', u' ')
-        value = value.replace('\t', ' ').strip()
-    else:
-        return None, None
-    return key, value
-
-
-def get_specs(url):
-    """Return specs as a dictionary"""
-    html_doc = urlopen(url, timeout=5)
-    html_doc = html_doc.read()
-    soup = BeautifulSoup(html_doc, "html.parser")
-
-    specs = {}
-    soup_price = soup.find("div", {"id": "results"})
-    soup_price = soup_price.find("div", {"class": "panel"})
-    try:
-        specs["prix"] = soup_price.find("a", {"class": "go"}).text
-    except AttributeError:
-        specs["prix"] = None
-    soup = soup.find("div", {"id": "specs"})
-    for spec in soup.find_all("tr"):
-        key, value = extract_spec(spec)
-        if key:
-            specs[key] = value
-
-    return specs
-
-
 def get_laptop_urls_in_page(page_url):
     """Get all links to laptops specs in one page"""
     html_doc = urlopen(page_url).read()
@@ -80,6 +48,7 @@ def get_laptop_urls_in_page(page_url):
                 url = urljoin(root_url, url.split('/')[-1])
                 specs_urls[key] = url
         except KeyError:
+            # Ads don't have an id so we just pass
             pass
     return specs_urls
 
@@ -125,10 +94,49 @@ def get_laptops_urls(n_threads=16):
     return df
 
 
+# Specifications extraction
+def extract_spec(spec):
+    """Extract a single spec from a BeautifulSoup object"""
+    key = spec.find("th", {"scope": "row"})
+    if key:
+        key = key.text
+        key = key.replace("\n", " ").strip()
+        value = spec.find("td").text
+        value = value.replace("\n", " ")
+        value = value.replace(u'\xa0', u' ')
+        value = value.replace('\t', ' ').strip()
+    else:
+        return None, None
+    return key, value
+
+
+def get_specs(url):
+    """Return specs as a dictionary"""
+    html_handler = urlopen(url)
+    html = html_handler.read()
+    soup = BeautifulSoup(html, "html.parser")
+
+    specs = {}
+    soup_price = soup.find("div", {"id": "results"})
+    soup_price = soup_price.find("div", {"class": "panel"})
+    try:
+        specs["prix"] = soup_price.find("a", {"class": "go"}).text
+    except AttributeError:
+        specs["prix"] = None
+    soup = soup.find("div", {"id": "specs"})
+    for spec in soup.find_all("tr"):
+        key, value = extract_spec(spec)
+        if key:
+            specs[key] = value
+
+    return specs
+
+
 @save_and_reload_df
-def get_all_laptops_specs(df_laptops_urls, overwrite=False):
+def get_all_laptops_specs(df_laptops_urls, n_threads=16):
     """Get specs for all laptops urls"""
     df = df_laptops_urls
+
     # Initialize columns
     url = df.iloc[0]["url"]
     specs = get_specs(url)
@@ -136,19 +144,33 @@ def get_all_laptops_specs(df_laptops_urls, overwrite=False):
     df = add_columns(df, columns)
     columns = set(df.columns)
 
-    for index, row in tqdm(df.iterrows(), total=df.shape[0]):
-        if row.isnull().values[1:].all():
-            url = row["url"]
-            specs = get_specs(url)
-            if len(specs) == 0:
-                print(url)
-                pass
-            specs["url"] = url
-            new_cols = set(specs.keys())
-            if (new_cols != columns):
-                df = add_columns(df, new_cols - columns)
-                columns = set(df.columns)
-            df.loc[index] = specs
+    def fetch_and_process():
+        while True:
+            index, row = q.get()
+            if row.isnull().values[1:].all():
+                url = row["url"]
+                specs = get_specs(url)
+                if len(specs) == 0:
+                    print(url)
+                    pass
+                specs["url"] = url
+                df.loc[index] = specs
+            q.task_done()
+
+    q = Queue(n_threads * 2)
+    for i in range(n_threads):
+        t = Thread(target=fetch_and_process)
+        t.daemon = True
+        t.start()
+    try:
+        for index, row in tqdm(df.iterrows(), total=df.shape[0]):
+            q.put((index, row))
+        start_time = time.time()
+        q.join()
+        print(time.time() - start_time)
+    except KeyboardInterrupt:
+        sys.exit(1)
+
     return df
 
 
