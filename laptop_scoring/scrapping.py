@@ -61,16 +61,19 @@ def get_price(soup):
 def get_laptop_urls_in_page(page_url):
     """Get all links to laptops specs adn prices in one page"""
     soup = url2soup(page_url)
-    laptop_blocks = soup.find_all("div", {"class": "product"})
-    specs_urls = {}
-    for block in laptop_blocks:
-        if block.has_attr("id"):
-            key = block["id"]
-            url = block.find("a", {"class": "white"})["href"]
-            if "tablette" not in url:
-                url = urljoin(root_url, url.split('/')[-1])
-                price = get_price(block)
-                specs_urls[key] = (url, price)
+    if soup:
+        laptop_blocks = soup.find_all("div", {"class": "product"})
+        specs_urls = {}
+        for block in laptop_blocks:
+            if block.has_attr("id"):
+                key = block["id"]
+                url = block.find("a", {"class": "white"})["href"]
+                if "tablette" not in url:
+                    url = urljoin(root_url, url.split('/')[-1])
+                    price = get_price(block)
+                    specs_urls[key] = (url, price)
+    else:
+        specs_urls = None
     return specs_urls
 
 
@@ -99,13 +102,35 @@ def get_laptops_urls(n_threads=16):
     max_page = get_max_page()
     page_urls = [urljoin(root_url, "{}").format(i+1) for i in range(max_page)]
 
-    specs_urls = {}
     # Parallel retrieval
-    results = ThreadPool(n_threads).imap_unordered(
-        get_laptop_urls_in_page, page_urls
-    )
-    for laptop_urls in tqdm(results, total=len(page_urls)):
-        specs_urls.update(laptop_urls)
+    specs_urls = {}
+
+    def fetch_and_process():
+        """Process what's in the queue until there is nothing left"""
+        while True:
+            url = q.get()
+            laptop_urls = get_laptop_urls_in_page(url)
+            if laptop_urls:
+                specs_urls.update(laptop_urls)
+            else:
+                # The request did not succeed, do it again
+                q.put(url)
+            q.task_done()
+
+    q = Queue(n_threads * 2)
+    for i in range(n_threads):
+        t = Thread(target=fetch_and_process)
+        t.daemon = True
+        t.start()
+    try:
+        # Add arguments
+        for i in tqdm(range(max_page)):
+            url = urljoin(root_url, "{}").format(i+1)
+            q.put(url)
+        # Wait for everybody to finish
+        q.join()
+    except KeyboardInterrupt:
+        sys.exit(1)
 
     # Convert urls to dataframe
     df = pd.DataFrame(specs_urls).transpose()
@@ -132,14 +157,15 @@ def extract_spec(spec):
 def get_specs(url):
     """Return specs as a dictionary"""
     soup = url2soup(url)
-
-    specs = {}
-    soup = soup.find("div", {"id": "specs"})
-    for spec in soup.find_all("tr"):
-        key, value = extract_spec(spec)
-        if key:
-            specs[key] = value
-
+    if soup:
+        specs = {}
+        soup = soup.find("div", {"id": "specs"})
+        for spec in soup.find_all("tr"):
+            key, value = extract_spec(spec)
+            if key:
+                specs[key] = value
+    else:
+        specs = None
     return specs
 
 
@@ -151,17 +177,22 @@ def get_all_laptops_specs(df_laptops_urls, n_threads=16):
     # Initialize columns
     url = df.iloc[0]["url"]
     specs = get_specs(url)
-    columns = set(specs.keys())
+    columns = set(specs.keys() + ["url", "prix"])
     df = add_columns(df, columns)
     columns = set(df.columns)
 
     def fetch_and_process():
+        """Process what's in the queue until there is nothing left"""
         while True:
             index, row = q.get()
             specs = get_specs(row["url"])
-            specs["url"] = row["url"]
-            specs["prix"] = row["prix"]
-            df.loc[index] = specs
+            if specs:
+                specs["url"] = row["url"]
+                specs["prix"] = row["prix"]
+                df.loc[index] = specs
+            else:
+                # The request did not succeed, do it again
+                q.put((index, row))
             q.task_done()
 
     q = Queue(n_threads * 2)
