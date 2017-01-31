@@ -7,7 +7,7 @@ from threading import Thread
 import time
 from urllib.request import urlopen
 from urllib.parse import urljoin
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -61,7 +61,7 @@ def url2soup(url):
         html_handler = urlopen(url)
         html = html_handler.read()
         soup = BeautifulSoup(html, "html.parser")
-    except HTTPError as e:
+    except (HTTPError, URLError, ConnectionResetError) as e:
         print("Error fetching {} : {}".format(url.lower(), e))
         soup = None
     return soup
