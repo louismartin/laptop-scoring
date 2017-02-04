@@ -13,7 +13,10 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from tqdm import tqdm
 
-root_url = "http://www.comparez-malin.fr/informatique/pc-portable/"
+# Global variables
+ROOT_URL = "http://www.comparez-malin.fr/informatique/pc-portable/"
+DATA_DIR = "data"
+BACKUP_DIR = os.path.join(DATA_DIR, "backup")
 
 
 def save_and_reload_df(func):
@@ -23,9 +26,8 @@ def save_and_reload_df(func):
     """
     def func_wrapper(*args, overwrite=False, **kwargs):
         # Create all the paths and filenames necessary
-        data_dir = "data"
         filename = "{}.csv".format(func.__name__)
-        csv_path = os.path.join("data", filename)
+        csv_path = os.path.join(DATA_DIR, filename)
         # The file already exists so we just read it from disk
         if os.path.exists(csv_path) and not overwrite:
             print("Reading dataframe from {}".format(csv_path))
@@ -33,8 +35,8 @@ def save_and_reload_df(func):
         # Either the file does not exist or we want to compute it again
         else:
             # Make sure the data directory already exists
-            if not os.path.exists(data_dir):
-                os.makedirs(data_dir)
+            if not os.path.exists(DATA_DIR):
+                os.makedirs(DATA_DIR)
 
             # Compute the new file
             df = func(*args, **kwargs)
@@ -43,10 +45,9 @@ def save_and_reload_df(func):
             if os.path.exists(csv_path) and overwrite:
                 timestamp = int(time.time())
                 backup_filename = "{}_{}.csv".format(func.__name__, timestamp)
-                backup_dir = os.path.join(data_dir, "backup")
-                backup_path = os.path.join(backup_dir, backup_filename)
-                if not os.path.exists(backup_dir):
-                    os.makedirs(backup_dir)
+                backup_path = os.path.join(BACKUP_DIR, backup_filename)
+                if not os.path.exists(BACKUP_DIR):
+                    os.makedirs(BACKUP_DIR)
                 os.rename(csv_path, backup_path)
 
             # Save the new file
@@ -90,7 +91,7 @@ def get_laptop_urls_in_page(page_url):
                 key = block["id"]
                 url = block.find("a", {"class": "white"})["href"]
                 if "tablette" not in url:
-                    url = urljoin(root_url, url.split('/')[-1])
+                    url = urljoin(ROOT_URL, url.split('/')[-1])
                     price = get_price(block)
                     specs_urls[key] = (url, price)
     else:
@@ -109,7 +110,7 @@ def add_columns(df, columns):
 
 def get_max_page():
     """Get maximum page of laptops"""
-    soup = url2soup(root_url)
+    soup = url2soup(ROOT_URL)
     # Find arrow at the bottom pointing to last page
     # There are 2 arrows, get the last
     arrow = soup.find_all("a", {"aria-label": "Next"})
@@ -121,7 +122,7 @@ def get_max_page():
 def get_laptops_urls(n_threads=16):
     """Get links to each laptop page in a dataframe"""
     max_page = get_max_page()
-    page_urls = [urljoin(root_url, "{}").format(i+1) for i in range(max_page)]
+    page_urls = [urljoin(ROOT_URL, "{}").format(i+1) for i in range(max_page)]
 
     # Parallel retrieval
     specs_urls = {}
@@ -146,7 +147,7 @@ def get_laptops_urls(n_threads=16):
     try:
         # Add arguments
         for i in tqdm(range(max_page)):
-            url = urljoin(root_url, "{}").format(i+1)
+            url = urljoin(ROOT_URL, "{}").format(i+1)
             q.put(url)
         # Wait for everybody to finish
         q.join()
