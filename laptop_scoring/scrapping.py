@@ -153,14 +153,14 @@ def get_specs(url):
 
 
 @save_and_reload_df
-def get_all_laptops_specs(df_laptops_urls, n_threads=16):
+def get_all_laptops_specs(df_urls, n_threads=16):
     """Get specs for all laptops urls"""
-    df = df_laptops_urls.copy()
+    df = df_urls.copy()
 
     # Initialize columns
     url = df.iloc[0]["url"]
     specs = get_specs(url)
-    columns = set(list(specs.keys()) + ["url", "prix"])
+    columns = set(list(specs.keys()) + list(df_urls.columns))
     df = add_columns(df, columns)
     columns = set(df.columns)
 

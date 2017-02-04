@@ -1,4 +1,27 @@
+import glob
+import os
+
 import numpy as np
+import pandas as pd
+
+from laptop_scoring.utils import BACKUP_DIR
+
+
+def get_min_price(df_urls):
+    """
+    returns the all time minimum price of current laptops based on dataframes
+    stored in the backup directory
+    """
+    paths = glob.glob(os.path.join(BACKUP_DIR, "get_laptops_urls*.csv"))
+    cols = []
+    for i, path in enumerate(paths):
+        timestamp = int(path.split("_")[-1].split(".")[0])
+        df_temp = pd.read_csv(path, index_col=0)
+        suffix = "_{}".format(timestamp)
+        df_urls = df_urls.join(df_temp, how="left", rsuffix=suffix)
+        cols.append("prix" + suffix)
+
+    return df_urls[cols].min(axis=1)
 
 
 def process_and_clean(df):
