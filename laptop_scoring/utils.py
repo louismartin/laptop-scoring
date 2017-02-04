@@ -1,9 +1,53 @@
+import os
+import time
 from urllib.request import urlopen
 from urllib.parse import urljoin
 
-import numpy as np
 from bs4 import BeautifulSoup
 from IPython.core.display import display, HTML
+import numpy as np
+import pandas as pd
+
+
+DATA_DIR = "data"
+BACKUP_DIR = os.path.join(DATA_DIR, "backup")
+
+
+def save_and_reload_df(func):
+    """
+    Decorator that saves the dataframe computed by the function
+    and loads it if it was already saved.
+    """
+    def func_wrapper(*args, overwrite=False, **kwargs):
+        # Create all the paths and filenames necessary
+        filename = "{}.csv".format(func.__name__)
+        csv_path = os.path.join(DATA_DIR, filename)
+        # The file already exists so we just read it from disk
+        if os.path.exists(csv_path) and not overwrite:
+            print("Reading dataframe from {}".format(csv_path))
+            df = pd.read_csv(csv_path, index_col=0)
+        # Either the file does not exist or we want to compute it again
+        else:
+            # Compute the new file
+            df = func(*args, **kwargs)
+
+            # Make sure the data directory already exists
+            if not os.path.exists(DATA_DIR):
+                os.makedirs(DATA_DIR)
+
+            # Back up the old file if it exists
+            if os.path.exists(csv_path) and overwrite:
+                timestamp = int(time.time())
+                backup_filename = "{}_{}.csv".format(func.__name__, timestamp)
+                backup_path = os.path.join(BACKUP_DIR, backup_filename)
+                if not os.path.exists(BACKUP_DIR):
+                    os.makedirs(BACKUP_DIR)
+                os.rename(csv_path, backup_path)
+
+            # Save the new file
+            df.to_csv(csv_path)
+        return df
+    return func_wrapper
 
 
 def scale(col):
