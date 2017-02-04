@@ -198,7 +198,7 @@ def get_all_laptops_specs(df_laptops_urls, n_threads=16):
     # Initialize columns
     url = df.iloc[0]["url"]
     specs = get_specs(url)
-    columns = set(specs.keys() + ["url", "prix"])
+    columns = set(list(specs.keys()) + ["url", "prix"])
     df = add_columns(df, columns)
     columns = set(df.columns)
 

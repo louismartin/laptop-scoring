@@ -50,7 +50,8 @@ def display_laptop(url, full=False):
 
         # Replace relative link to seller with absolute link
         link = soup.find("a", {"class": "price"})
-        link.attrs["href"] = urljoin(url, link.attrs["href"])
+        if link:
+            link.attrs["href"] = urljoin(url, link.attrs["href"])
 
         # Display html
         display(HTML(str(soup)))
