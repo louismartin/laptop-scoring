@@ -26,20 +26,23 @@ def get_min_price(df_urls):
 
 def process_and_clean(df):
     """RIP good practices, my laziness won over you"""
+    cols_str = ["disque_dur", "usb", "composition"]
+    df[cols_str] = df[cols_str].fillna("")
     df["prix_public"] = df["prix_public"].str.strip("€").str.replace(" ", "")\
         .str.replace(",", ".").astype(float)
     df[["coeurs", "min_freq", "max_freq"]] = df["fréquence"]\
         .str.split(expand=True)[[0, 2, 4]].astype(float)
     df["single_core_benchmark"] = df["cpu_benchmark"] / df["coeurs"]
-    df["pdt_max"] = df["pdt_max"].str.split(expand=True)[0].astype(int)
-    df["mémoire_ram"] = df["mémoire_ram"].str.split(expand=True)[0].astype(int)
+    df["pdt_max"] = df["pdt_max"].str.split(expand=True)[0].astype(float)
+    df["mémoire_ram"] = df["mémoire_ram"].str.split(expand=True)[0]\
+        .astype(float)
 
     # Split disque_dur in sshd (bool), hdd_size, hdd_speed, ssd_size
     df["sshd"] = df["disque_dur"].apply(lambda x: ("cache SSD" in x))
     df["disque_dur"] = df["disque_dur"].str.replace("cache SSD", "")\
         .str.replace("(", "").str.replace(")", "")
     df["hdd_size"] = df["disque_dur"].apply(
-        lambda x: (int(x.split("tr/min")[0].split()[0])
+        lambda x: (float(x.split("tr/min")[0].split()[0])
                    if ("tr/min" in x) else 0)
         )
     df["hdd_speed"] = df["disque_dur"].apply(
@@ -52,7 +55,7 @@ def process_and_clean(df):
                    if ("Go SSD" in x) else 0)
         )
 
-    df["res_width"] = df["résolution"].str.split(expand=True)[0].astype(int)
+    df["res_width"] = df["résolution"].str.split(expand=True)[0].astype(float)
     df["taille"] = df["taille"].str.split('" ', expand=True)[0].astype(float)
     df[["width", "depth", "height"]] = df["dimensions"]\
         .str.split(expand=True)[[0, 2, 4]].astype(float)
@@ -83,7 +86,7 @@ def process_and_clean(df):
         lambda x: x.split("Type-C")[-1] if "Type-C" in x else ""
         )
     df[["day", "month", "year"]] = df["date"].str.split("/", expand=True)\
-        .astype(int)
+        .astype(float)
 
     # Clean rows for easier reading
     df["processeur"] = df["processeur"].str.replace("Intel Core", "")
@@ -91,5 +94,4 @@ def process_and_clean(df):
         .str.replace("Nvidia", "").str.replace("GeForce", "")\
         .str.replace("GTX", "").str.strip()
 
-    df = df.fillna(0)
     return df
