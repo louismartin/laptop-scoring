@@ -11,6 +11,11 @@ import pandas as pd
 
 DATA_DIR = "data"
 BACKUP_DIR = os.path.join(DATA_DIR, "backup")
+IMG_DIR = os.path.join(DATA_DIR, "images")
+# Make sure the directories exist
+for directory in [DATA_DIR, BACKUP_DIR, IMG_DIR]:
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 
 def save_and_reload_df(func):
@@ -31,17 +36,11 @@ def save_and_reload_df(func):
             # Compute the new file
             df = func(*args, **kwargs)
 
-            # Make sure the data directory already exists
-            if not os.path.exists(DATA_DIR):
-                os.makedirs(DATA_DIR)
-
             # Back up the old file if it exists
             if os.path.exists(csv_path) and overwrite:
                 timestamp = int(time.time())
                 backup_filename = "{}_{}.csv".format(func.__name__, timestamp)
                 backup_path = os.path.join(BACKUP_DIR, backup_filename)
-                if not os.path.exists(BACKUP_DIR):
-                    os.makedirs(BACKUP_DIR)
                 os.rename(csv_path, backup_path)
 
             # Save the new file
@@ -102,8 +101,8 @@ def display_laptop(url, full=False):
 
 
 def print_score(row):
-    print("total: {0:.2f} - prix: {1:.2f}".format(row["total"], row["prix"]))
-    row = row.drop(["total", "score", "prix"])
+    print("total: {0:.2f}".format(row["total"]))
+    row = row.drop(["total", "score"])
     row_pos = row[row > 0].sort_values(ascending=False)
     row_neg = row[row < 0].sort_values()
 

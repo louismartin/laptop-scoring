@@ -1,8 +1,9 @@
 from queue import Queue
+import os
 import sys
 from threading import Thread
 import time
-from urllib.request import urlopen
+from urllib.request import urlopen, urlretrieve
 from urllib.parse import urljoin
 from urllib.error import HTTPError, URLError
 
@@ -10,7 +11,7 @@ from bs4 import BeautifulSoup
 import pandas as pd
 from tqdm import tqdm
 
-from laptop_scoring.utils import save_and_reload_df
+from laptop_scoring.utils import save_and_reload_df, IMG_DIR
 
 
 # Global variables
@@ -54,7 +55,12 @@ def get_laptop_urls_in_page(page_url):
                 if "tablette" not in url:
                     url = urljoin(ROOT_URL, url.split('/')[-1])
                     price = get_price(block)
-                    specs_urls[key] = (url, price)
+                    image_soup = block.find("div", {"class": "gallery"})
+                    if image_soup:
+                        image_url = image_soup.a["href"]
+                    else:
+                        image_url = None
+                    specs_urls[key] = (url, image_url, price)
     else:
         specs_urls = None
     return specs_urls
@@ -117,8 +123,19 @@ def get_laptops_urls(n_threads=16):
 
     # Convert urls to dataframe
     df = pd.DataFrame(specs_urls).transpose()
-    df.columns = ["url", "prix"]
+    df.columns = ["url", "image_url", "prix"]
     return df
+
+
+def save_images(df_urls):
+    df_urls["image_url"] = df_urls["image_url"].fillna("")
+    for index, row in tqdm(df_urls.iterrows(), total=df_urls.shape[0]):
+        image_url = row["image_url"]
+        if len(image_url):
+            filename = "{}.jpg".format(index)
+            path = os.path.join(IMG_DIR, filename)
+            if not os.path.exists(path):
+                urlretrieve(image_url, path)
 
 
 # Specifications extraction
@@ -162,7 +179,6 @@ def get_all_laptops_specs(df_urls, n_threads=16):
     specs = get_specs(url)
     columns = set(list(specs.keys()) + list(df_urls.columns))
     df = add_columns(df, columns)
-    columns = set(df.columns)
 
     def fetch_and_process():
         """Process what's in the queue until there is nothing left"""
@@ -170,9 +186,10 @@ def get_all_laptops_specs(df_urls, n_threads=16):
             index, row = q.get()
             specs = get_specs(row["url"])
             if specs:
-                specs["url"] = row["url"]
-                specs["prix"] = row["prix"]
-                df.loc[index] = specs
+                # Add values that were already there in df_urls
+                for col in df_urls.columns:
+                    specs[col] = row[col]
+                df.loc[index, list(specs.keys())] = list(specs.values())
             else:
                 # The request did not succeed, do it again
                 q.put((index, row))
