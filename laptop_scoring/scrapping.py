@@ -214,12 +214,12 @@ def get_cpu_benchmark(cpu_name):
     root_url = "http://www.cpubenchmark.net/cpu.php?cpu={}"
     url = root_url.format(cpu_name.replace(" ", "+"))
     soup = url2soup(url)
+    benchmark = 0
     if soup:
         # Square with perf and single thread rating
         soup = soup.find("td", {"style": "text-align: center"})
-        benchmark = int(soup.find("span").text)
-    else:
-        benchmark = None
+        if soup:
+            benchmark = int(soup.find("span").text)
     return benchmark
 
 
@@ -242,9 +242,9 @@ def get_gpu_benchmark(gpu_name):
             benchmark *= (1 - 0.2*pascal)
             benchmark = int(benchmark)
         else:
-            benchmark = None
+            benchmark = 0
     except IndexError:
-        benchmark = None
+        benchmark = 0
     return benchmark
 
 
@@ -266,7 +266,5 @@ def get_gpu_dataframe(gpus):
         gpu_name = row["puce_graphique_dédiée"]
         gpu_name = gpu_name.replace("GT ", "").replace("\t(SLI)", "")
         benchmark = get_gpu_benchmark(gpu_name)
-        if benchmark is None:
-            benchmark = 0
         df_gpu.loc[index, "gpu_benchmark"] = benchmark
     return df_gpu
