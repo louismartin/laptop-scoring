@@ -39,17 +39,17 @@ def process_and_clean(df):
 
     # Split disque_dur in sshd (bool), hdd_size, hdd_speed, ssd_size
     df["sshd"] = df["disque_dur"].apply(lambda x: ("cache SSD" in x))
-    df["disque_dur"] = df["disque_dur"].str.replace("cache SSD", "")\
+    s_dd = df["disque_dur"].str.replace("cache SSD", "")\
         .str.replace("(", "").str.replace(")", "")
-    df["hdd_size"] = df["disque_dur"].apply(
+    df["hdd_size"] = s_dd.apply(
         lambda x: (float(x.split("tr/min")[0].split()[0])
                    if ("tr/min" in x) else 0)
         )
-    df["hdd_speed"] = df["disque_dur"].apply(
+    df["hdd_speed"] = s_dd.apply(
         lambda x: (int((x.split("tr/min")[0].strip().split()[-1]))
                    if ("tr/min" in x) else 0)
         )
-    df["ssd_size"] = df["disque_dur"].apply(
+    df["ssd_size"] = s_dd.apply(
         lambda x: (int(x.split("tr/min")[-1].split("Go SSD")[0]
                    .split()[-1].replace("SSD", ""))
                    if ("Go SSD" in x) else 0)

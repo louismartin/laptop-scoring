@@ -7,6 +7,8 @@ from bs4 import BeautifulSoup
 from IPython.core.display import display, HTML
 import numpy as np
 import pandas as pd
+import dominate
+from dominate.tags import *
 
 
 DATA_DIR = "data"
@@ -72,9 +74,52 @@ def ease(x, method="sqrt", asymetric=False):
     return out
 
 
-def display_laptop(url, full=False):
+def row2html(row):
+    row_html = div(cls="row")
+    with row_html:
+        hr()
+        with div(cls="col-xs-12 col-sm-12 col-md-12 col-lg-4"):
+            img(src=row["image_url"], style="width:290px;")
+        with div(cls="col-xs-12 col-sm-12 col-md-6 col-lg-5"):
+            title = "{} {}".format(row["marque"], row["référence"])
+            h1(title, style="margin-bottom:10px")
+            with ul():
+                li('Écran de {}" {}{}'.format(
+                    row["taille"],
+                    row["type_de_dalle"],
+                    " (anti-reflets)" if (row["anti-reflet"] == "oui") else ""
+                  ))
+                li('Résolution {}'.format(row["résolution"]))
+                formatting_string = 'Processeur {} ({} x {min_freq:.1f} à \
+                                     {max_freq:.1f} GHz) - ({bench})'
+                li(formatting_string.format(
+                    row["processeur"], int(row["coeurs"]),
+                    min_freq=row["min_freq"], max_freq=row["max_freq"],
+                    bench=int(row["cpu_benchmark"])
+                  ))
+                li('Carte graphique: {} - ({})'.format(
+                    row["puce_graphique_dédiée"], int(row["gpu_benchmark"])
+                  ))
+                li('Ram: {} Go'.format(int(row["mémoire_ram"])))
+                li(row["disque_dur"])
+                li(a("Voir les caractéristiques complètes", href=row["url"]))
+        with div(cls="col-xs-12 col-sm-12 col-md-6 col-lg-3",
+                 style="margin-top:80px"):
+            with a(cls="btn btn-lg btn-block btn-success",
+                   href=row["url"], target="_blank"):
+                strong("{} €".format(row["prix"]))
+                br()
+                span(" (min {} €)".format(row["prix_min"]))
+        return row_html
+
+
+def display_laptop(row, offline=False, full=False):
     """Display summary of each laptop in a notebook"""
-    if full:
+    url = row["url"]
+    if offline:
+        row_html = row2html(row)
+        display(HTML(str(row_html)))
+    elif full:
         iframe = '<iframe width="100%" height="350" src="{}"></iframe>'
         display(HTML(iframe.format(url)))
     else:
