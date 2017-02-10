@@ -4,7 +4,8 @@ from urllib.request import urlopen
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
-from IPython.core.display import display, HTML
+from IPython.core.display import display, HTML, clear_output
+from ipywidgets import widgets
 import numpy as np
 import pandas as pd
 import dominate
@@ -168,3 +169,23 @@ def print_score(row):
         else:
             string += " / "
     print(string)
+
+
+def draw_rank_page(df, start=0, offline=False):
+    n = 5
+    end = start + n
+
+    def on_button_clicked(b):
+        container.close()
+        clear_output()
+        draw_rank_page(df, start=b.value, offline=offline)
+
+    btn_next = widgets.Button(description="Next", value=(start+n))
+    btn_next.on_click(on_button_clicked)
+    btn_prev = widgets.Button(description="Previous", value=(start-n))
+    btn_prev.on_click(on_button_clicked)
+    container = widgets.VBox(children=[btn_next, btn_prev])
+    display(container)
+    print("Page {}.".format((start//n) + 1))
+    for i, (index, row) in enumerate(df.iloc[start:end].iterrows()):
+        display_laptop(row, offline=offline)
