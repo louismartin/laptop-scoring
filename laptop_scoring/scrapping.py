@@ -99,7 +99,7 @@ def get_laptops_urls(n_threads=16):
         while True:
             url = q.get()
             laptop_urls = get_laptop_urls_in_page(url)
-            if laptop_urls:
+            if laptop_urls is not None:
                 specs_urls.update(laptop_urls)
             else:
                 # The request did not succeed, do it again
