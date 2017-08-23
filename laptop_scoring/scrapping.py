@@ -239,7 +239,7 @@ def get_gpu_benchmark(gpu_name):
             # SLI are slightly better
             benchmark *= (1 + 0.2*sli)
             # The benchmark for pascal GPUs is the desktop benchmark !
-            benchmark *= (1 - 0.2*pascal)
+            benchmark *= (1 - 0.1*pascal)
             benchmark = int(benchmark)
         else:
             benchmark = 0
@@ -264,7 +264,7 @@ def get_gpu_dataframe(gpus):
     df_gpu = pd.DataFrame(gpus, columns=["puce_graphique_dédiée"])
     for index, row in tqdm(df_gpu.iterrows(), total=df_gpu.shape[0]):
         gpu_name = row["puce_graphique_dédiée"]
-        gpu_name = gpu_name.replace("GT ", "").replace("\t(SLI)", "")
+        gpu_name = gpu_name.replace("GT ", "").replace("\t", "")
         benchmark = get_gpu_benchmark(gpu_name)
         df_gpu.loc[index, "gpu_benchmark"] = benchmark
     return df_gpu

@@ -12,7 +12,9 @@ import dominate
 from dominate.tags import *
 
 
-DATA_DIR = "data"
+SRC_DIR = os.path.dirname(os.path.realpath(__file__))
+ROOT_DIR = os.path.abspath(os.path.join(SRC_DIR, os.pardir))
+DATA_DIR = os.path.join(ROOT_DIR, "data")
 BACKUP_DIR = os.path.join(DATA_DIR, "backup")
 IMG_DIR = os.path.join(DATA_DIR, "images")
 # Make sure the directories exist
@@ -171,14 +173,14 @@ def print_score(row):
     print(string)
 
 
-def draw_rank_page(df, start=0, offline=False):
+def draw_rank_page(df, start=0, offline=False, df_score=None):
     n = 5
     end = start + n
 
     def on_button_clicked(b):
         container.close()
         clear_output()
-        draw_rank_page(df, start=b.value, offline=offline)
+        draw_rank_page(df, start=b.value, offline=offline, df_score=df_score)
 
     btn_next = widgets.Button(description="Next", value=(start+n))
     btn_next.on_click(on_button_clicked)
@@ -189,3 +191,5 @@ def draw_rank_page(df, start=0, offline=False):
     print("Page {}.".format((start//n) + 1))
     for i, (index, row) in enumerate(df.iloc[start:end].iterrows()):
         display_laptop(row, offline=offline)
+        if df_score is not None:
+            print_score(df_score.loc[index])
