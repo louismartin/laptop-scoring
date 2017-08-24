@@ -68,11 +68,21 @@ def get_laptop_urls_in_page(page_url):
 
 def add_columns(df, columns):
     """Add columns to a dataframe"""
-    # Remove columns that are already there
-    columns = set(columns) - set(df.columns)
-    df_columns = pd.DataFrame(columns=columns)
-    df = df.join(df_columns, how='outer')
+    # Take only columns that were not already there
+    new_columns = set(columns) - set(df.columns)
+    if len(new_columns) == 0:
+        return df
+    df_new_columns = pd.DataFrame(columns=new_columns)
+    df = df.join(df_new_columns, how='outer')
     return df
+
+
+def add_columns_inplace(df, columns):
+    """Add columns to a dataframe INPLACE"""
+    # Take only columns that were not already there
+    new_columns = set(columns) - set(df.columns)
+    for col in new_columns:
+        df[col] = None
 
 
 def get_max_page():
@@ -185,6 +195,8 @@ def get_all_laptops_specs(df_urls, n_threads=16):
         while True:
             index, row = q.get()
             specs = get_specs(row["url"])
+            # Add columns that could be missing
+            add_columns_inplace(df, specs.keys())
             if specs:
                 # Add values that were already there in df_urls
                 for col in df_urls.columns:

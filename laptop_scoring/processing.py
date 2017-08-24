@@ -26,7 +26,7 @@ def get_min_price(df_urls):
 
 def process_and_clean(df):
     """RIP good practices, my laziness won over you"""
-    cols_str = ["disque_dur", "usb", "composition"]
+    cols_str = ["stockage", "usb", "composition"]
     df[cols_str] = df[cols_str].fillna("")
     df["prix_public"] = df["prix_public"].str.strip("€").str.replace(" ", "")\
         .str.replace(",", ".").astype(float)
@@ -37,9 +37,9 @@ def process_and_clean(df):
     df["mémoire_ram"] = df["mémoire_ram"].str.split(expand=True)[0]\
         .astype(float)
 
-    # Split disque_dur in sshd (bool), hdd_size, hdd_speed, ssd_size
-    df["sshd"] = df["disque_dur"].apply(lambda x: ("cache SSD" in x))
-    s_dd = df["disque_dur"].str.replace("cache SSD", "")\
+    # Split stockage in sshd (bool), hdd_size, hdd_speed, ssd_size
+    df["sshd"] = df["stockage"].apply(lambda x: ("cache SSD" in x))
+    s_dd = df["stockage"].str.replace("cache SSD", "")\
         .str.replace("(", "").str.replace(")", "")
     df["hdd_size"] = s_dd.apply(
         lambda x: (float(x.split("tr/min")[0].split()[0])
