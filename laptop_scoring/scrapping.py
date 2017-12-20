@@ -9,6 +9,7 @@ from urllib.error import HTTPError, URLError
 
 from bs4 import BeautifulSoup
 import pandas as pd
+import numpy as np
 from tqdm import tqdm
 
 from laptop_scoring.utils import save_and_reload_df, IMG_DIR
@@ -96,9 +97,9 @@ def get_max_page():
 
 
 @save_and_reload_df
-def get_laptops_urls(n_threads=16):
-    """Get links to each laptop page in a dataframe"""
-    max_page = get_max_page()
+def get_laptops_urls(n_threads=16, max_page=np.inf):
+    """Get links to each laptop page in a dataframe."""
+    max_page = min(max_page, get_max_page())
     page_urls = [urljoin(ROOT_URL, "{}").format(i+1) for i in range(max_page)]
 
     # Parallel retrieval
