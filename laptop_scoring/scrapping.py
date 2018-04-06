@@ -1,5 +1,6 @@
 from queue import Queue
 import os
+import re
 import sys
 from threading import Thread
 import time
@@ -243,6 +244,7 @@ def get_gpu_benchmark(gpu_name):
         pascal_models = ["1050", "1060", "1070", "1080"]
         pascal = any([model in gpu_name for model in pascal_models])
         gpu_name = gpu_name.replace(" (SLI)", "")
+        gpu_name = re.sub("\d Go de mémoire vive", "", gpu_name)
         url = root_url.format(gpu_name.replace(" ", "+"))
         soup = url2soup(url)
         if soup:

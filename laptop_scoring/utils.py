@@ -90,7 +90,7 @@ def row2html(row):
                 li('Écran de {}" {}{}'.format(
                     row["taille"],
                     row["type_de_dalle"],
-                    " (anti-reflets)" if (row["anti-reflet"] == "oui") else ""
+                    " (anti-reflets)" if (row["anti-reflets"] == "oui") else ""
                   ))
                 li('Résolution {}'.format(row["résolution"]))
                 formatting_string = 'Processeur {} ({} x {min_freq:.1f} à \
@@ -104,7 +104,7 @@ def row2html(row):
                     row["puce_graphique_dédiée"], int(row["gpu_benchmark"])
                   ))
                 li('Ram: {} Go'.format(int(row["mémoire_ram"])))
-                li(row["disque_dur"])
+                li(row["stockage"])
                 li(a("Voir les caractéristiques complètes", href=row["url"]))
         with div(cls="col-xs-12 col-sm-12 col-md-6 col-lg-3",
                  style="margin-top:80px"):

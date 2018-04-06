@@ -39,22 +39,8 @@ def process_and_clean(df):
 
     # Split stockage in sshd (bool), hdd_size, hdd_speed, ssd_size
     df["sshd"] = df["stockage"].apply(lambda x: ("cache SSD" in x))
-    s_dd = df["stockage"].str.replace("cache SSD", "")\
-        .str.replace("(", "").str.replace(")", "")
-    df["hdd_size"] = s_dd.apply(
-        lambda x: (float(x.split("tr/min")[0].split()[0])
-                   if ("tr/min" in x) else 0)
-        )
-    df["hdd_speed"] = s_dd.apply(
-        lambda x: (int((x.split("tr/min")[0].strip().split()[-1]))
-                   if ("tr/min" in x) else 0)
-        )
-    df["ssd_size"] = s_dd.apply(
-        lambda x: (int(x.split("tr/min")[-1].split("Go SSD")[0]
-                   .split()[-1].replace("SSD", ""))
-                   if ("Go SSD" in x) else 0)
-        )
-
+    df[['hdd_size', 'hdd_speed']] = df['stockage'].str.extract('(\d+) GoHDD\d\.\d"(\d+) tr/min', expand=True).fillna(0).astype(int)
+    df['ssd_size'] = df['stockage'].str.extract('(\d+) GoSSD', expand=True).fillna(0).astype(int)
     df["res_width"] = df["résolution"].str.split(expand=True)[0].astype(float)
     df["taille"] = df["taille"].str.split('" ', expand=True)[0].astype(float)
     df[["width", "depth", "height"]] = df["dimensions"]\
